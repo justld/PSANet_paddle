@@ -92,10 +92,8 @@ class EG1800(Dataset):
             os.path.join(dataset_root, 'Labels', file).strip() for file in files
         ]
 
-        self.file_list = [
-            [img_path, label_path]
-            for img_path, label_path in zip(img_files, label_files)
-        ]
+        self.file_list = [[img_path, label_path] for img_path, label_path in
+                          zip(img_files, label_files)]
         pass
 
     def __getitem__(self, item):

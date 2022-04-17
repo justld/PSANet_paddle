@@ -69,16 +69,27 @@ class PSANet(nn.Layer):
         self.enable_auxiliary_loss = enable_auxiliary_loss
         self.backbone = backbone
         self.backbone_indices = backbone_indices
-        
+
         backbone_channels = [
             backbone.feat_channels[i] for i in backbone_indices
         ]
 
         if use_psa:
-            self.psa = PSA(backbone_channels[-1], 512, psa_type, shrink_factor, mask_h, mask_w, normalization_factor, psa_softmax)
-        self.head = layers.AuxLayer(backbone_channels[-1] * (2 if use_psa else 1), 512, num_classes, dropout_prob=dropout, bias_attr=False)
+            self.psa = PSA(backbone_channels[-1], 512, psa_type, shrink_factor,
+                           mask_h, mask_w, normalization_factor, psa_softmax)
+        self.head = layers.AuxLayer(
+            backbone_channels[-1] * (2 if use_psa else 1),
+            512,
+            num_classes,
+            dropout_prob=dropout,
+            bias_attr=False)
         if enable_auxiliary_loss:
-            self.aux_head = layers.AuxLayer(backbone_channels[-2], 256, num_classes, dropout_prob=dropout, bias_attr=False)
+            self.aux_head = layers.AuxLayer(
+                backbone_channels[-2],
+                256,
+                num_classes,
+                dropout_prob=dropout,
+                bias_attr=False)
 
         self.align_corners = align_corners
         self.pretrained = pretrained
@@ -113,10 +124,21 @@ class PSANet(nn.Layer):
 
 
 class PSA(nn.Layer):
-    def __init__(self, in_channels=2048, mid_channels=512, psa_type=2, shrink_factor=2, mask_h=59, mask_w=59, normalization_factor=1.0, psa_softmax=True):
+    def __init__(self,
+                 in_channels=2048,
+                 mid_channels=512,
+                 psa_type=2,
+                 shrink_factor=2,
+                 mask_h=59,
+                 mask_w=59,
+                 normalization_factor=1.0,
+                 psa_softmax=True):
         super().__init__()
-        assert psa_type in [0, 1, 2], "Only support psa type in [0, 1, 2], but got {}.".format(psa_type)
-        assert mask_h % 2 == 0 and mask_w % 2 == 0, "The value of mask_h and mask_w in point-wise spatial attention module must be odd number, but got {} and {}.".format(mask_h, mask_w)
+        assert psa_type in [
+            0, 1, 2
+        ], "Only support psa type in [0, 1, 2], but got {}.".format(psa_type)
+        assert mask_h % 2 == 0 and mask_w % 2 == 0, "The value of mask_h and mask_w in point-wise spatial attention module must be odd number, but got {} and {}.".format(
+            mask_h, mask_w)
         self.mid_channels = mid_channels
         self.psa_type = psa_type
         self.shrink_factor = shrink_factor
@@ -127,19 +149,31 @@ class PSA(nn.Layer):
             normalization_factor = mask_h * mask_w
         self.normalization_factor = normalization_factor
 
-        self.reduce_layer = layers.ConvBNReLU(in_channels, mid_channels, kernel_size=1, bias_attr=False)
+        self.reduce_layer = layers.ConvBNReLU(
+            in_channels, mid_channels, kernel_size=1, bias_attr=False)
         self.attention = nn.Sequential(
-            layers.ConvBNReLU(mid_channels, mid_channels, kernel_size=1, bias_attr=False),
-            nn.Conv2D(mid_channels, mask_h * mask_w, kernel_size=1, bias_attr=False),
+            layers.ConvBNReLU(
+                mid_channels, mid_channels, kernel_size=1, bias_attr=False),
+            nn.Conv2D(
+                mid_channels, mask_h * mask_w, kernel_size=1, bias_attr=False),
         )
-        
+
         if psa_type == 2:
-            self.reduce_p = layers.ConvBNReLU(in_channels, mid_channels, kernel_size=1, bias_attr=False)
+            self.reduce_p = layers.ConvBNReLU(
+                in_channels, mid_channels, kernel_size=1, bias_attr=False)
             self.attention_p = nn.Sequential(
-                layers.ConvBNReLU(mid_channels, mid_channels, kernel_size=1, bias_attr=False),
-                nn.Conv2D(mid_channels, mask_h * mask_w, kernel_size=1, bias_attr=False),
-            )
-        self.proj = layers.ConvBNReLU(mid_channels * (2 if psa_type == 2 else 1), in_channels, kernel_size=1, bias_attr=False)
+                layers.ConvBNReLU(
+                    mid_channels, mid_channels, kernel_size=1, bias_attr=False),
+                nn.Conv2D(
+                    mid_channels,
+                    mask_h * mask_w,
+                    kernel_size=1,
+                    bias_attr=False), )
+        self.proj = layers.ConvBNReLU(
+            mid_channels * (2 if psa_type == 2 else 1),
+            in_channels,
+            kernel_size=1,
+            bias_attr=False)
 
     def forward(self, x):
         input_shape = paddle.shape(x)
@@ -149,32 +183,54 @@ class PSA(nn.Layer):
             n, c, h, w = paddle.shape(x)
             h = (h - 1) // self.shrink_factor + 1
             w = (w - 1) // self.shrink_factor + 1
-            x = F.interpolate(x, size=[h, w], mode='bilinear', align_corners=True)
+            x = F.interpolate(
+                x, size=[h, w], mode='bilinear', align_corners=True)
             y = self.attention(x)
-            y = psa_mask_op(y, self.psa_type, y.shape[0], y.shape[2], y.shape[3], self.mask_h, self.mask_w, self.mask_h // 2, self.mask_w // 2)
+            y = psa_mask_op(y, self.psa_type, y.shape[0], y.shape[2],
+                            y.shape[3], self.mask_h, self.mask_w, self.mask_h //
+                            2, self.mask_w // 2)
             if self.psa_softmax:
                 y = F.softmax(y, axis=1)
-            x = paddle.bmm(x.reshape([n, self.mid_channels, h * w]), y.reshape([n, h * w, h * w])).reshape([n, self.mid_channels, h, w]) / self.normalization_factor
+            x = paddle.bmm(
+                x.reshape([n, self.mid_channels, h * w]),
+                y.reshape([n, h * w, h * w])).reshape(
+                    [n, self.mid_channels, h, w]) / self.normalization_factor
         elif self.psa_type == 2:
             x_col = self.reduce_layer(x)
             x_dis = self.reduce_p(x)
             n, c, h, w = paddle.shape(x_col)
             h = (h - 1) // self.shrink_factor + 1
             w = (w - 1) // self.shrink_factor + 1
-            x_col = F.interpolate(x_col, size=[h, w], mode='bilinear', align_corners=True)
-            x_dis = F.interpolate(x_dis, size=[h, w], mode='bilinear', align_corners=True)
-            
+            x_col = F.interpolate(
+                x_col, size=[h, w], mode='bilinear', align_corners=True)
+            x_dis = F.interpolate(
+                x_dis, size=[h, w], mode='bilinear', align_corners=True)
+
             y_col = self.attention(x_col)
             y_dis = self.attention_p(x_dis)
-            y_col = psa_mask_op(y_col, 0, y_col.shape[0], y_col.shape[2], y_col.shape[3], self.mask_h, self.mask_w, self.mask_h // 2, self.mask_w // 2)
-            y_dis = psa_mask_op(y_dis, 1, y_dis.shape[0], y_dis.shape[2], y_dis.shape[3], self.mask_h, self.mask_w, self.mask_h // 2, self.mask_w // 2)
+            y_col = psa_mask_op(y_col, 0, y_col.shape[0], y_col.shape[2],
+                                y_col.shape[3], self.mask_h, self.mask_w,
+                                self.mask_h // 2, self.mask_w // 2)
+            y_dis = psa_mask_op(y_dis, 1, y_dis.shape[0], y_dis.shape[2],
+                                y_dis.shape[3], self.mask_h, self.mask_w,
+                                self.mask_h // 2, self.mask_w // 2)
             if self.psa_softmax:
                 y_col = F.softmax(y_col, axis=1)
                 y_dis = F.softmax(y_dis, axis=1)
             n, c, h, w = paddle.shape(x_col)
-            x_col = paddle.bmm(x_col.reshape([n, self.mid_channels, h * w]), y_col.reshape([n, h * w, h * w])).reshape([n, self.mid_channels, h, w])  / self.normalization_factor
-            x_dis = paddle.bmm(x_dis.reshape([n, self.mid_channels, h * w]), y_dis.reshape([n, h * w, h * w])).reshape([n, self.mid_channels, h, w])  / self.normalization_factor
+            x_col = paddle.bmm(
+                x_col.reshape([n, self.mid_channels, h * w]),
+                y_col.reshape([n, h * w, h * w])).reshape(
+                    [n, self.mid_channels, h, w]) / self.normalization_factor
+            x_dis = paddle.bmm(
+                x_dis.reshape([n, self.mid_channels, h * w]),
+                y_dis.reshape([n, h * w, h * w])).reshape(
+                    [n, self.mid_channels, h, w]) / self.normalization_factor
             x = paddle.concat([x_dis, x_col], axis=1)
         x = self.proj(x)
-        x = F.interpolate(x, size=[input_shape[2], input_shape[3]], mode='bilinear', align_corners=True)
+        x = F.interpolate(
+            x,
+            size=[input_shape[2], input_shape[3]],
+            mode='bilinear',
+            align_corners=True)
         return paddle.concat([residual, x], axis=1)

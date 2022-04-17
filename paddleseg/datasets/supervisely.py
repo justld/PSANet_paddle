@@ -92,10 +92,8 @@ class SUPERVISELY(Dataset):
             for file in files
         ]
 
-        self.file_list = [
-            [img_path, label_path]
-            for img_path, label_path in zip(img_files, label_files)
-        ]
+        self.file_list = [[img_path, label_path] for img_path, label_path in
+                          zip(img_files, label_files)]
 
     def __getitem__(self, item):
         image_path, label_path = self.file_list[item]

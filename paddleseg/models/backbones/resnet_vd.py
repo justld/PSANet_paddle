@@ -241,8 +241,8 @@ class ResNet_vd(nn.Layer):
         num_filters = [64, 128, 256, 512]
 
         # for channels of four returned stages
-        self.feat_channels = [c * 4 for c in num_filters
-                              ] if layers >= 50 else num_filters
+        self.feat_channels = [c * 4 for c in
+                              num_filters] if layers >= 50 else num_filters
 
         dilation_dict = None
         if output_stride == 8:
