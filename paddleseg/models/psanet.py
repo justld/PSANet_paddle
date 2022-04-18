@@ -137,7 +137,7 @@ class PSA(nn.Layer):
         assert psa_type in [
             0, 1, 2
         ], "Only support psa type in [0, 1, 2], but got {}.".format(psa_type)
-        assert mask_h % 2 == 0 and mask_w % 2 == 0, "The value of mask_h and mask_w in point-wise spatial attention module must be odd number, but got {} and {}.".format(
+        assert mask_h % 2 == 1 and mask_w % 2 == 1, "The value of mask_h and mask_w in point-wise spatial attention module must be odd number, but got {} and {}.".format(
             mask_h, mask_w)
         self.mid_channels = mid_channels
         self.psa_type = psa_type
