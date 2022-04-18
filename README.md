@@ -19,7 +19,7 @@
 
 | NetWork | steps |opt| image_size | batch_size |dataset|memory| card |  mIou  |                               config                               |                             weight                             |            log             |
 |:-------:|:-----:| :---: |:----------:|:----------:| :---: | :---: |:----:|:------:|:------------------------------------------------------------------:|:--------------------------------------------------------------:|:--------------------------:|
-| PSANet  |  80K  |SGD|  1024x512  |     8      |CityScapes|32G|  1   | 79.44% | [psanet_resnet50_os8_cityscapes_1024x512_80k.yml](configs\psanet\psanet_resnet50_os8_cityscapes_1024x512_80k.yml) | [weight 提取码：pg32](https://pan.baidu.com/s/1NyLO4nWggNOcVsif3Gj0aQ) | [log](log/trainer-log.txt) |
+| PSANet  |  80K  |SGD|  1024x512  |     8      |CityScapes|32G|  1   | 79.44% | [psanet_resnet50_os8_cityscapes_1024x512_80k.yml](configs/psanet/psanet_resnet50_os8_cityscapes_1024x512_80k.yml) | [weight 提取码：pg32](https://pan.baidu.com/s/1NyLO4nWggNOcVsif3Gj0aQ) | [log](log/trainer-log.txt) |
 
 ## 3 数据集
 [CityScapes dataset](https://www.cityscapes-dataset.com/)
