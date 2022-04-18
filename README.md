@@ -17,9 +17,9 @@
 >在CityScapes val数据集的测试效果如下表。
 
 
-| NetWork | steps |opt| image_size | batch_size |dataset|memory| card |  mIou  |                               config                               |                             weight                             |             log             |
-|:-------:|:-----:| :---: |:----------:|:----------:| :---: | :---: |:----:|:------:|:------------------------------------------------------------------:|:--------------------------------------------------------------:|:---------------------------:|
-| PSANet  |  80K  |SGD|  1024x512  |     8      |CityScapes|32G|  1   | 79.44% | [psanet_resnet50_os8_cityscapes_1024x512_80k.yml](configs\psanet\psanet_resnet50_os8_cityscapes_1024x512_80k.yml) | [weight 提取码：pg32](https://pan.baidu.com/s/1NyLO4nWggNOcVsif3Gj0aQ) | [log](train_log/trainer-log.txt) |
+| NetWork | steps |opt| image_size | batch_size |dataset|memory| card |  mIou  |                               config                               |                             weight                             |            log             |
+|:-------:|:-----:| :---: |:----------:|:----------:| :---: | :---: |:----:|:------:|:------------------------------------------------------------------:|:--------------------------------------------------------------:|:--------------------------:|
+| PSANet  |  80K  |SGD|  1024x512  |     8      |CityScapes|32G|  1   | 79.44% | [psanet_resnet50_os8_cityscapes_1024x512_80k.yml](configs\psanet\psanet_resnet50_os8_cityscapes_1024x512_80k.yml) | [weight 提取码：pg32](https://pan.baidu.com/s/1NyLO4nWggNOcVsif3Gj0aQ) | [log](log/trainer-log.txt) |
 
 ## 3 数据集
 [CityScapes dataset](https://www.cityscapes-dataset.com/)
@@ -41,7 +41,7 @@
 ```bash
 # clone this repo
 git clone https://github.com/justld/PSANet_paddle.git
-cd CCNet_paddle
+cd PSANet_paddle
 ```
 
 **安装第三方库**
@@ -56,7 +56,7 @@ pip install -r requirements.txt
 ```bash
 python train.py --config configs\psanet\psanet_resnet50_os8_cityscapes_1024x512_80k.yml  --do_eval --use_vdl --log_iter 100 --save_interval 4000 --save_dir output
 ```
-多卡训练：
+多卡训练(psamask自定义算子多卡编译可能有问题，不推荐)：
 ```bash
 python -m paddle.distributed.launch train.py --config configs\psanet\psanet_resnet50_os8_cityscapes_1024x512_80k.yml  --do_eval --use_vdl --log_iter 100 --save_interval 1000 --save_dir output
 ```
