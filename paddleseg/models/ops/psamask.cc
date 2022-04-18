@@ -238,8 +238,8 @@ std::vector<paddle::Tensor> PSAMaskBackward(const paddle::Tensor& x,
 
 
 // 维度推导
-std::vector<std::vector<int64_t>> PSAMaskInferShape(std::vector<int64_t> x_shape) {
-  return {x_shape};
+std::vector<std::vector<int64_t>> PSAMaskInferShape(const std::vector<int64_t> x_shape) {
+    return {std::vector<int64_t>{x_shape[0], x_shape[2] * x_shape[3], x_shape[2], x_shape[3]}};
 }
 
 // 类型推导
