@@ -19,7 +19,7 @@
 
 | NetWork | steps |opt| image_size | batch_size |dataset|memory| card |  mIou  |                               config                               |                             weight                             |            log             |
 |:-------:|:-----:| :---: |:----------:|:----------:| :---: | :---: |:----:|:------:|:------------------------------------------------------------------:|:--------------------------------------------------------------:|:--------------------------:|
-| PSANet  |  80K  |SGD|  1024x512  |     8      |CityScapes|32G|  1   | 79.44% | [psanet_resnet50_os8_cityscapes_1024x512_80k.yml](configs/psanet/psanet_resnet50_os8_cityscapes_1024x512_80k.yml) | [weight 提取码：pg32](https://pan.baidu.com/s/1NyLO4nWggNOcVsif3Gj0aQ) | [log](log/trainer-log.txt) |
+| PSANet  |  80K  |SGD|  1024x512  |     8      |CityScapes|32G|  1   | 79.94% | [psanet_resnet50_os8_cityscapes_1024x512_80k.yml](configs/psanet/psanet_resnet50_os8_cityscapes_1024x512_80k.yml) | [weight 提取码：2fbf](https://pan.baidu.com/s/1gr1Oqc1kWQ0PwhHYQKv88A) | [log](log/trainer-log.txt) |
 
 ## 3 数据集
 [CityScapes dataset](https://www.cityscapes-dataset.com/)
@@ -106,7 +106,7 @@ bash test_tipc/test_train_inference_python.sh ./test_tipc/configs/psanet/train_i
 │  val.py  
 ```
 **说明**
-1、本项目在Aistudio平台，使用Tesla V100 * 1 训练80K miou达到79.44%。  
+1、本项目在Aistudio平台，使用Tesla V100 * 1 训练80K miou达到79.94%。  
 2、本项目基于PaddleSeg开发。  
 
 ## 6 模型信息
