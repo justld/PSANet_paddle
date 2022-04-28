@@ -72,7 +72,7 @@ python val.py --config configs\psanet\psanet_resnet50_os8_cityscapes_1024x512_80
 ```bash
 bash test_tipc/prepare.sh ./test_tipc/configs/psanet/train_infer_python.txt 'lite_train_lite_infer'
 ```
-接着运行训练推理一体化测试脚本（注意：由于自定义的外部算子psamask仅能通过test_tipc训练部分）：
+接着运行训练推理一体化测试脚本（test——tipc可以通过，但是自定义算子静态图推理与动态图推理不一致，不建议模型导出为静态图）：
 ```bash
 bash test_tipc/test_train_inference_python.sh ./test_tipc/configs/psanet/train_infer_python.txt 'lite_train_lite_infer'
 ```
